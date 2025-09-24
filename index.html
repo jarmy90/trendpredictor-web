@@ -583,52 +583,10 @@
         </div>
     </footer>
 
-    <!-- ✅ Supabase SDK (una sola vez, sin espacios) -->
+    <!-- Supabase SDK -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
     <script>
-        // ✅ CONFIGURACIÓN DE TU PROYECTO SUPABASE
+        // Configuración de Supabase
         const supabaseUrl = 'https://wuilgfqgxhusypcrivoy.supabase.co';
-        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1aWxnZnFneGh1c3lwY3Jpdm95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1NDAyNDQsImV4cCI6MjA3NDExNjI0NH0.EH922YVZsqBwKSiw2DiKwWvk8TX2pkJWcQJv3gLH9Ug';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
-
-        // ✅ FUNCIÓN GLOBAL: REGISTRO
-        function signup() {
-            const email = prompt("Introduce tu email:");
-            const password = prompt("Contraseña (mínimo 6 caracteres):");
-            if (!email || !password || password.length < 6) {
-                alert("Por favor, introduce un email válido y una contraseña de al menos 6 caracteres.");
-                return;
-            }
-
-            supabase.auth.signUp({ email, password })
-                .then(({ data, error }) => {
-                    if (error) {
-                        alert("Error: " + error.message);
-                        console.error("Error de registro:", error);
-                    } else {
-                        alert("¡Registro exitoso! Revisa tu email para confirmar tu cuenta.");
-                    }
-                })
-                .catch(err => {
-                    alert("Error técnico: " + err.message);
-                    console.error("Excepción:", err);
-                });
-        }
-
-        // ✅ FUNCIÓN GLOBAL: LOGIN
-        function login() {
-            const email = prompt("Email:");
-            const password = prompt("Contraseña:");
-            supabase.auth.signInWithPassword({ email, password })
-                .then(({ data, error }) => {
-                    if (error) {
-                        alert("Error: " + error.message);
-                    } else {
-                        alert("¡Bienvenido!");
-                    }
-                });
-        }
-    </script>
-</body>
-</html>
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1
