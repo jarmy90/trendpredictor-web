@@ -3,120 +3,234 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TrendPredictor - Registro</title>
+  <title>TrendPredictor - Pronósticos</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    :root {
+      --primary: #6a11cb;
+      --secondary: #2575fc;
+      --success: #2ecc71;
+      --danger: #e74c3c;
+      --light: #ecf0f1;
+      --dark: #2c3e50;
+    }
+    * {
       margin: 0;
-      padding: 40px 20px;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       color: #333;
+      min-height: 100vh;
+      padding: 2rem 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    header h1 {
+      font-size: 2.2rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+    header p {
+      color: #7f8c8d;
     }
     .card {
       background: white;
       padding: 30px;
       border-radius: 12px;
       box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-      text-align: center;
-      max-width: 500px;
-      width: 100%;
-    }
-    h1 {
-      color: #6a11cb;
-      margin-bottom: 10px;
-    }
-    p {
-      color: #7f8c8d;
       margin-bottom: 25px;
     }
+    .user-info {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      text-align: center;
+      margin-bottom: 25px;
+      display: none;
+    }
+    .user-info.active {
+      display: block;
+    }
     .btn {
-      background: linear-gradient(to right, #6a11cb, #2575fc);
+      display: inline-block;
+      padding: 12px 24px;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
       color: white;
       border: none;
-      padding: 12px 30px;
-      font-size: 16px;
       border-radius: 6px;
+      font-size: 16px;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: all 0.3s;
+      margin: 8px 0;
     }
     .btn:hover {
+      opacity: 0.9;
       transform: translateY(-2px);
     }
+    .btn-secondary {
+      background: #95a5a6;
+    }
     .status {
-      margin-top: 20px;
+      margin-top: 15px;
       padding: 10px;
-      background: #ecf0f1;
       border-radius: 6px;
       font-size: 14px;
       display: none;
     }
+    .status.success { background: #d5f5e3; color: #27ae60; }
+    .status.error { background: #fadbd8; color: #c0392b; }
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      color: #7f8c8d;
+      font-size: 0.9rem;
+    }
+    @media (max-width: 600px) {
+      .card, .user-info {
+        padding: 20px;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>🎯 TrendPredictor</h1>
-    <p>Regístrate para hacer pronósticos y ganar créditos virtuales.</p>
-    <button class="btn" onclick="signup()">Registrarse</button>
-    <button class="btn" style="background: #7f8c8d; margin-top: 10px;" onclick="login()">Iniciar sesión</button>
-    <div class="status" id="status"></div>
+  <div class="container">
+    <header>
+      <h1>🎯 TrendPredictor</h1>
+      <p>Pronostica tendencias de Netflix, TikTok, deportes y más. ¡Gana créditos y compite!</p>
+    </header>
+
+    <!-- Formulario de registro/login -->
+    <div class="card" id="auth-form">
+      <h2 style="margin-bottom: 20px; color: var(--dark);">Inicia sesión o regístrate</h2>
+      <button class="btn" onclick="signup()">Registrarse</button>
+      <button class="btn btn-secondary" onclick="login()">Iniciar sesión</button>
+      <div class="status" id="auth-status"></div>
+    </div>
+
+    <!-- Perfil del usuario (se muestra si está logueado) -->
+    <div class="user-info" id="user-profile">
+      <h2>¡Hola, <span id="user-email">usuario</span>!</h2>
+      <p>Tus créditos: <strong id="user-credits">Cargando...</strong></p>
+      <button class="btn btn-secondary" onclick="logout()">Cerrar sesión</button>
+    </div>
+
+    <footer>
+      <p>© 2025 TrendPredictor. Plataforma de entretenimiento con créditos virtuales.</p>
+      <p><strong>Importante:</strong> No se permite el canje por dinero real. Solo para mayores de 18 años.</p>
+    </footer>
   </div>
 
   <!-- Supabase SDK -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
   <script>
-    // ✅ CONFIGURACIÓN CORRECTA (sin espacios al final)
+    // ✅ CONFIGURACIÓN DE SUPABASE (sin espacios al final)
     const supabaseUrl = 'https://wuilgfqgxhusypcrivoy.supabase.co';
     const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1aWxnZnFneGh1c3lwY3Jpdm95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1NDAyNDQsImV4cCI6MjA3NDExNjI0NH0.EH922YVZsqBwKSiw2DiKwWvk8TX2pkJWcQJv3gLH9Ug';
     const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
 
-    function showStatus(msg, isError = false) {
-      const el = document.getElementById('status');
-      el.textContent = msg;
-      el.style.display = 'block';
-      el.style.color = isError ? '#e74c3c' : '#2ecc71';
+    // Elementos del DOM
+    const authForm = document.getElementById('auth-form');
+    const userProfile = document.getElementById('user-profile');
+    const authStatus = document.getElementById('auth-status');
+    const userEmailEl = document.getElementById('user-email');
+    const userCreditsEl = document.getElementById('user-credits');
+
+    // Mostrar mensaje
+    function showMessage(msg, isError = false) {
+      authStatus.textContent = msg;
+      authStatus.className = `status ${isError ? 'error' : 'success'}`;
+      authStatus.style.display = 'block';
     }
 
+    // Registro
     async function signup() {
       const email = prompt("Introduce tu email:");
       const password = prompt("Contraseña (mínimo 6 caracteres):");
       if (!email || !password || password.length < 6) {
-        showStatus("❌ Email o contraseña inválidos.", true);
+        showMessage("❌ Email o contraseña inválidos.", true);
         return;
       }
 
       const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) {
-        showStatus("❌ Error: " + error.message, true);
-        console.error("Error:", error);
+        showMessage("❌ Error: " + error.message, true);
+        console.error("Error registro:", error);
       } else {
-        showStatus("✅ ¡Registro enviado! Abre la consola (F12 → Console) y busca el enlace de confirmación.");
-        console.log("✅ Registro exitoso. Busca el enlace de confirmación en la consola.");
+        showMessage("✅ ¡Registro enviado! Abre la consola (F12 → Console) y busca el enlace de confirmación.");
+        console.log("✅ Registro exitoso. Busca el enlace de confirmación en la consola del navegador.");
       }
     }
 
+    // Login
     async function login() {
       const email = prompt("Email:");
       const password = prompt("Contraseña:");
       if (!email || !password) {
-        showStatus("❌ Datos inválidos.", true);
+        showMessage("❌ Datos inválidos.", true);
         return;
       }
 
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        showStatus("❌ Error: " + error.message, true);
+        showMessage("❌ Error: " + error.message, true);
         console.error("Error login:", error);
       } else {
-        showStatus("✅ ¡Bienvenido!");
-        console.log("Usuario logueado:", data.user);
+        showMessage("✅ ¡Bienvenido!");
+        loadUserProfile(data.user);
       }
     }
+
+    // Cerrar sesión
+    async function logout() {
+      await supabase.auth.signOut();
+      authForm.style.display = 'block';
+      userProfile.classList.remove('active');
+      showMessage("✅ Sesión cerrada.");
+    }
+
+    // Cargar perfil del usuario
+    async function loadUserProfile(user) {
+      if (!user) return;
+
+      userEmailEl.textContent = user.email;
+
+      // Intentar cargar créditos desde la tabla 'users'
+      try {
+        const { data, error } = await supabase.from('users').select('credits').eq('id', user.id).single();
+        if (error) throw error;
+        userCreditsEl.textContent = data.credits.toLocaleString();
+      } catch (err) {
+        userCreditsEl.textContent = "1,000"; // valor por defecto si no existe la tabla
+      }
+
+      authForm.style.display = 'none';
+      userProfile.classList.add('active');
+    }
+
+    // Inicializar al cargar la página
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Limpiar URL si viene de Supabase
+      if (window.location.hash.includes('access_token')) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
+      // Verificar si ya hay un usuario logueado
+      const {  { user } } = await supabase.auth.getUser();
+      if (user) {
+        loadUserProfile(user);
+      }
+    });
   </script>
 </body>
 </html>
