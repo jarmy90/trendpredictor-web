@@ -3,48 +3,119 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Prueba de Registro - TrendPredictor</title>
+  <title>TrendPredictor - Registro</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      margin: 0;
+      padding: 40px 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+    }
+    h1 {
+      color: #6a11cb;
+      margin-bottom: 10px;
+    }
+    p {
+      color: #7f8c8d;
+      margin-bottom: 25px;
+    }
+    .btn {
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+    .status {
+      margin-top: 20px;
+      padding: 10px;
+      background: #ecf0f1;
+      border-radius: 6px;
+      font-size: 14px;
+      display: none;
+    }
+  </style>
 </head>
-<body style="font-family: Arial, sans-serif; padding: 40px; text-align: center;">
-  <h2>Prueba de Registro</h2>
-  <p>Si funciona, al hacer clic en "Registrarse" te pedirá email y contraseña, y recibirás un email de confirmación.</p>
-  
-  <button onclick="signup()" style="padding: 12px 24px; font-size: 16px; background: #6a11cb; color: white; border: none; border-radius: 6px; cursor: pointer;">
-    Registrarse
-  </button>
+<body>
+  <div class="card">
+    <h1>🎯 TrendPredictor</h1>
+    <p>Regístrate para hacer pronósticos y ganar créditos virtuales.</p>
+    <button class="btn" onclick="signup()">Registrarse</button>
+    <button class="btn" style="background: #7f8c8d; margin-top: 10px;" onclick="login()">Iniciar sesión</button>
+    <div class="status" id="status"></div>
+  </div>
 
   <!-- Supabase SDK -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
   <script>
-    // ✅ Configuración de tu proyecto Supabase
+    // ✅ CONFIGURACIÓN CORRECTA (sin espacios al final)
     const supabaseUrl = 'https://wuilgfqgxhusypcrivoy.supabase.co';
     const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1aWxnZnFneGh1c3lwY3Jpdm95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1NDAyNDQsImV4cCI6MjA3NDExNjI0NH0.EH922YVZsqBwKSiw2DiKwWvk8TX2pkJWcQJv3gLH9Ug';
     const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
 
-    // ✅ Función de registro
-    function signup() {
+    function showStatus(msg, isError = false) {
+      const el = document.getElementById('status');
+      el.textContent = msg;
+      el.style.display = 'block';
+      el.style.color = isError ? '#e74c3c' : '#2ecc71';
+    }
+
+    async function signup() {
       const email = prompt("Introduce tu email:");
       const password = prompt("Contraseña (mínimo 6 caracteres):");
-      
       if (!email || !password || password.length < 6) {
-        alert("Por favor, introduce un email válido y una contraseña de al menos 6 caracteres.");
+        showStatus("❌ Email o contraseña inválidos.", true);
         return;
       }
 
-      supabase.auth.signUp({ email, password })
-        .then(({ data, error }) => {
-          if (error) {
-            alert("❌ Error: " + error.message);
-            console.error("Error:", error);
-          } else {
-            alert("✅ ¡Registro enviado! Revisa tu email para confirmar.");
-          }
-        })
-        .catch(err => {
-          alert("⚠️ Error técnico: " + err.message);
-          console.error("Excepción:", err);
-        });
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      if (error) {
+        showStatus("❌ Error: " + error.message, true);
+        console.error("Error:", error);
+      } else {
+        showStatus("✅ ¡Registro enviado! Abre la consola (F12 → Console) y busca el enlace de confirmación.");
+        console.log("✅ Registro exitoso. Busca el enlace de confirmación en la consola.");
+      }
+    }
+
+    async function login() {
+      const email = prompt("Email:");
+      const password = prompt("Contraseña:");
+      if (!email || !password) {
+        showStatus("❌ Datos inválidos.", true);
+        return;
+      }
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        showStatus("❌ Error: " + error.message, true);
+        console.error("Error login:", error);
+      } else {
+        showStatus("✅ ¡Bienvenido!");
+        console.log("Usuario logueado:", data.user);
+      }
     }
   </script>
 </body>
